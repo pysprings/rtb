@@ -6,6 +6,9 @@ from twisted.protocols import basic
 
 class Robot(basic.LineReceiver):
     delimiter = os.linesep
+    name = 'twister'
+    home_color = '000fff444'
+    away_color = '000dddaaa'
 
     def lineReceived(self, line):
         # Ignore blank lines
@@ -31,6 +34,12 @@ class Robot(basic.LineReceiver):
     def do_print(self, message):
         self.sendLine('Print {0}'.format(message))
 
+    def do_name(self, name):
+        self.sendLine('Name {0}'.format(name))
+
+    def do_color(self, home_color, away_color):
+        self.sendLine('Colour {0} {1}'.format(home_color, away_color))
+
     def on_initialize(self, first):
         """
         This is the very first message the robot will get. If the argument is
@@ -39,6 +48,32 @@ class Robot(basic.LineReceiver):
         YourColour messages.
         """
         first = bool(int(first))
+
+        if first:
+            self.do_name(self.name)
+            self.do_color(self.home_color, self.away_color)
+
+    def on_gamestarts(self):
+        """This message is sent when the game starts."""
+
+    def on_robotsleft(self, robots):
+        """
+        At the beginning of the game and when a robot is killed the number of
+        remaining robots is broadcasted to all living robots.
+        """
+        robots = int(robots)
+
+    def on_gameoption(self, opt_number, opt_value):
+        """
+        At the beginning of each game the robots will be sent a number of
+        settings, which can be useful for the robot. For a complete list of
+        these, look in the file Messagetypes.h for the game_option_type enum.
+        In the options chapter you can get more detailed information on each
+        option. The debug level is also sent as a game option even though it is
+        not in the options list.
+        """
+        opt_number = int(opt_number)
+        opt_value = float(opt_value)
 
 
 def main():

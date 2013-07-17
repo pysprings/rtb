@@ -32,12 +32,30 @@ class Robot(basic.LineReceiver):
                 self.sendLine('Error: ' + str(e))
 
     def do_print(self, message):
+        """
+        Print message on the message window.
+        """
         self.sendLine('Print {0}'.format(message))
 
     def do_name(self, name):
+        """
+        When receiving the Initialize message with argument 1, indicating that
+        this is the first sequence, you should send both your name and your
+        colour. If your name ends with the string Team: teamname, you will be
+        in the team teamname. For example "Name foo Team: bar" will assign you
+        to the team bar and your name will be foo. All robots in a team will
+        have the same colour and will recognize them over the RobotInfo
+        message. For a more sophisticated possibilities, please take a look
+        onto the RealTimeBattle Team Framework.
+        """
         self.sendLine('Name {0}'.format(name))
 
     def do_color(self, home_color, away_color):
+        """
+        The colours are like normal football shirts, the home colour is used
+        unless it is already used. Otherwise the away colour or, as a last
+        resort, a non-occupied colour is selected randomly.
+        """
         self.sendLine('Colour {0} {1}'.format(home_color, away_color))
 
     def on_initialize(self, first):
@@ -75,6 +93,68 @@ class Robot(basic.LineReceiver):
         opt_number = int(opt_number)
         opt_value = float(opt_value)
 
+    def on_radar(self, distance, object_type, radar_angle):
+        """
+        This message gives information from the radar each turn. Remember that
+        the radar-angle is relative to the robot front; it is given in radians.
+        """
+        distance = float(distance)
+        object_type = int(object_type)
+        radar_angle = float(radar_angle) # in unnormalized radians, IIRC
+
+    def on_coordinates(self, x, y, angle):
+        """
+        Tells you the current robot position. It is only sent if the option
+        Send robot coordinates is 1 or 2. If it is 1 the coordinates are sent
+        relative the starting position, which has the effect that the robot
+        doesn't know where it is starting, but only where it has moved since.
+        """
+        x = float(x)
+        y = float(y)
+        angle = float(angle)
+
+    def on_info(self, time, speed, angle):
+        """
+        The Info message does always follow the Radar message. It gives more
+        general information on the state of the robot. The time is the
+        game-time elapsed since the start of the game. This is not necessarily
+        the same as the real time elapsed, due to time scale and max timestep.
+        """
+        time = float(time)
+        speed = float(speed)
+        angle = float(angle)
+
+    def on_energy(self, energy_level):
+        """
+        The end of each round the robot will get to know its energy level. It will
+        not, however, get the exact energy, instead it is discretized into a number
+        of energy levels.
+        """
+        energy_level = float(energy_level)
+
+    def on_collision(self, object_type, angle):
+        """
+        When a robot hits (or is hit by) something it gets this message. In the
+        file Messagetypes.h you can find a list of the object types. You get
+        the angle from where the collision occurred (the angle relative the
+        robot) and the type of object hitting you, but not how severe the
+        collision was. This can, however, be determined indirectly
+        (approximately) by the loss of energy.
+        """
+
+    def on_dead(self):
+        """
+        Robot died. Do not try to send more messages to the server until the
+        end of the game, the server doesn't read them.
+        """
+    def on_gamefinished(self):
+        """
+        Current game is finished, get prepared for the next!
+        """
+    def on_exitrobot(self):
+        """
+        Exit from the program immediately! Otherwise it will be killed forcefully.
+        """
 
 def main():
     stdio.StandardIO(Robot())

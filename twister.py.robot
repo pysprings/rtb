@@ -32,6 +32,12 @@ class Robot(basic.LineReceiver):
         self.sendLine('Print {0}'.format(message))
 
     def on_initialize(self, first):
+        """
+        This is the very first message the robot will get. If the argument is
+        one, it is the first sequence in the tournament and it should send Name
+        and Colour to the server, otherwise it should wait for YourName and
+        YourColour messages.
+        """
         first = bool(int(first))
 
 

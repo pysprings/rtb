@@ -153,12 +153,6 @@ class Robot(basic.LineReceiver):
         time = float(time)
         speed = float(speed)
         angle = float(angle)
-        # Main loop
-        self.do_accelerate(0.5)
-        self.do_rotate(7, 3)
-        for __ in xrange(10):
-            self.do_shoot(10)
-
 
     def on_energy(self, energy_level):
         """
@@ -202,8 +196,18 @@ class Robot(basic.LineReceiver):
         forcefully.
         """
 
+class Razzister(Robot):
+    name = 'Razzister'
+    home_color = 'fff000000'
+    away_color = '000ffffff'
+    def on_info(self, time, speed, angle):
+        self.do_accelerate(0.5)
+        self.do_rotate(7, 3)
+        for __ in xrange(10):
+            self.do_shoot(10)
+
 def main():
-    stdio.StandardIO(Robot())
+    stdio.StandardIO(Razzister())
     from twisted.internet import reactor
     reactor.run()
 

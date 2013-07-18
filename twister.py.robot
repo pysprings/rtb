@@ -58,6 +58,29 @@ class Robot(basic.LineReceiver):
         """
         self.sendLine('Colour {0} {1}'.format(home_color, away_color))
 
+    def dO_accelerate(amount):
+        """
+        Set the robot acceleration. Value is bounded by Robot max/min
+        acceleration.
+        """
+        self.sendLine('Accelerate {0}'.format(amount))
+
+    def do_rotate(what, velocity):
+        """
+        Set the angular velocity for the robot, its cannon and/or its radar.
+        Set 'what to rotate' to 1 for robot, 2 for cannon, 4 for radar or to a
+        sum of these to rotate more objects at the same time. The angular
+        velocity is given in radians per second and is limited by Robot
+        (cannon/radar) max rotate speed.
+        """
+        self.sendLine('Rotate {0}'.format(velocity))
+
+    def do_shoot(energy):
+        """
+        Shoot with the given energy. The shot options give more information.
+        """
+        self.sendLine('Shoot {0}'.format(energy))
+
     def on_initialize(self, first):
         """
         This is the very first message the robot will get. If the argument is
@@ -126,9 +149,9 @@ class Robot(basic.LineReceiver):
 
     def on_energy(self, energy_level):
         """
-        The end of each round the robot will get to know its energy level. It will
-        not, however, get the exact energy, instead it is discretized into a number
-        of energy levels.
+        The end of each round the robot will get to know its energy level. It
+        will not, however, get the exact energy, instead it is discretized into
+        a number of energy levels.
         """
         energy_level = float(energy_level)
 
@@ -147,13 +170,16 @@ class Robot(basic.LineReceiver):
         Robot died. Do not try to send more messages to the server until the
         end of the game, the server doesn't read them.
         """
+
     def on_gamefinished(self):
         """
         Current game is finished, get prepared for the next!
         """
+
     def on_exitrobot(self):
         """
-        Exit from the program immediately! Otherwise it will be killed forcefully.
+        Exit from the program immediately! Otherwise it will be killed
+        forcefully.
         """
 
 def main():

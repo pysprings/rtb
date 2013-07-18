@@ -12,8 +12,7 @@ class Robot(basic.LineReceiver):
 
     def lineReceived(self, line):
         # Ignore blank lines
-        if not line: return
-
+        if not line: return 
         # Parse the command
         commandParts = line.split()
         command = commandParts[0].lower()
@@ -29,7 +28,7 @@ class Robot(basic.LineReceiver):
             try:
                 method(*args)
             except Exception, e:
-                self.sendLine('Error: ' + str(e))
+                self.do_print('Exception: ' + str(e))
 
     def do_print(self, message):
         """
@@ -58,14 +57,14 @@ class Robot(basic.LineReceiver):
         """
         self.sendLine('Colour {0} {1}'.format(home_color, away_color))
 
-    def dO_accelerate(amount):
+    def do_accelerate(self, amount):
         """
         Set the robot acceleration. Value is bounded by Robot max/min
         acceleration.
         """
         self.sendLine('Accelerate {0}'.format(amount))
 
-    def do_rotate(what, velocity):
+    def do_rotate(self, what, velocity):
         """
         Set the angular velocity for the robot, its cannon and/or its radar.
         Set 'what to rotate' to 1 for robot, 2 for cannon, 4 for radar or to a
@@ -73,9 +72,9 @@ class Robot(basic.LineReceiver):
         velocity is given in radians per second and is limited by Robot
         (cannon/radar) max rotate speed.
         """
-        self.sendLine('Rotate {0}'.format(velocity))
+        self.sendLine('Rotate {1} {0}'.format(what, velocity))
 
-    def do_shoot(energy):
+    def do_shoot(self, energy):
         """
         Shoot with the given energy. The shot options give more information.
         """
@@ -96,6 +95,14 @@ class Robot(basic.LineReceiver):
 
     def on_gamestarts(self):
         """This message is sent when the game starts."""
+
+    def on_robotinfo(self, energy_level, teammate):
+        """
+        If you detect a robot with your radar, this message will follow, giving
+        some information on the robot. The opponents energy level will be given
+        in the same manner as your own energy. The second argument is only
+        interesting in team-mode, 1 means a teammate and 0 an enemy.
+        """
 
     def on_robotsleft(self, robots):
         """
@@ -146,6 +153,12 @@ class Robot(basic.LineReceiver):
         time = float(time)
         speed = float(speed)
         angle = float(angle)
+        # Main loop
+        self.do_accelerate(0.5)
+        self.do_rotate(7, 3)
+        for __ in xrange(10):
+            self.do_shoot(10)
+
 
     def on_energy(self, energy_level):
         """
@@ -164,6 +177,13 @@ class Robot(basic.LineReceiver):
         collision was. This can, however, be determined indirectly
         (approximately) by the loss of energy.
         """
+
+    def on_warning(self, warning_type, message):
+        warning_type = int(warning_type)
+        warnings = ['UNKNOWN_MESSAGE', 'PROCESS_TIME_LOW',
+                    'MESSAGE_SENT_IN_ILLEGAL_STATE', 'UNKNOWN_OPTION',
+                    'OBSOLETE_KEYWORD', 'NAME_NOT_GIVEN', 'COLOUR_NOT_GIVEN']
+        self.do_print(warnings[warning_type] + ": " + message)
 
     def on_dead(self):
         """

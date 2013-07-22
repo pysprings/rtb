@@ -1,0 +1,16 @@
+Outline
+=======
+ - Example
+ - Installation
+   - apt-get install realtimebattle
+ - Configuration
+   - Options -> misc
+     - Set robots directory appropriately
+ - Example Code
+   - Razzister
+   - URLs for code and robot framework
+ - Lean Coffee
+   - Theme is "Real Time Battle"
+ - Work Time
+   - Walk around and help folks build their robots and get everything setup
+ - Lean Coffee Ending

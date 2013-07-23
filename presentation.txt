@@ -7,8 +7,10 @@ Outline
    - Options -> misc
      - Set robots directory appropriately
  - Example Code
-   - Razzister
+   - Razzister -- http://tiny.cc/rtb-1
    - URLs for code and robot framework
+     - http://tiny.cc/rtb-2
+     - http://tiny.cc/rtb-3
  - Lean Coffee
    - Theme is "Real Time Battle"
  - Work Time

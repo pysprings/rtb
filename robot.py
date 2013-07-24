@@ -57,13 +57,6 @@ class Robot(basic.LineReceiver):
         """
         self.sendLine('Colour {0} {1}'.format(home_color, away_color))
 
-    def do_accelerate(self, amount):
-        """
-        Set the robot acceleration. Value is bounded by Robot max/min
-        acceleration.
-        """
-        self.sendLine('Accelerate {0}'.format(amount))
-
     def do_rotate(self, what, velocity):
         """
         Set the angular velocity for the robot, its cannon and/or its radar.
@@ -77,11 +70,78 @@ class Robot(basic.LineReceiver):
     def do_rotateto(self, what, velocity, angle):
         self.sendLine('RotateTo {0} {1} {2}'.format(what, velocity, angle))
 
+    def do_rotateamount(self, what, velocity, angle):
+        """
+        Rotate the given part (robot, turret or radar) to the given angle,
+        at the given velocity, relative to the current angle.
+        """
+        self.sendLine('RotateAngle {0} {1} {2}'.format(what, velocity, angle))
+
+    def do_sweep(self, what, velocity, right_angle, left_angle):
+        """
+        This does not work with the robot. This will set the radar or turret to
+        sweep between the given angles at the given angular velocity.
+
+        NOTE: There may be an error where the radar does not report events when
+        in sweep mode.
+        """
+        self.sendLine('Sweep {0} {1} {2} {3}'.format(what, velocity,
+            right_angle, left_angle))
+
+    def do_accelerate(self, amount):
+        """
+        Set the robot acceleration. Value is bounded by Robot max/min
+        acceleration.
+        """
+        self.sendLine('Accelerate {0}'.format(amount))
+
     def do_shoot(self, energy):
         """
         Shoot with the given energy. The shot options give more information.
         """
         self.sendLine('Shoot {0}'.format(energy))
+
+    def do_brake(self, portion):
+        """
+        Applies the brake. `Portion' ranges from 0.0 to 1.0, where
+        1.0 means that the friction is equal to the (world-defined) 
+        slide friction
+        """
+        self.sendLine('Brake {0}'.format(portion))
+
+    def do_debug(self, message):
+        """
+        Prints a message in the message window if in debug mode.
+
+        TODO:
+        Maybe turn off this command if it's not in debug mode
+        """
+        self.sendLine('Debug {0}'.format(message))
+
+    def do_debugline(self, angle1, radius1, angle2, radius2):
+        """
+        From the docs:
+        Draw a line direct to the arena. This is only allowed in the highest
+        debug level(5), otherwise a warning message is sent. The arguments are
+        the start and end point of the line given in polar coordinates relative
+        to the robot.
+
+        All of the arguments are doubles.
+        """
+        self.sendLine('DebugLine {0} {1} {2} {3}'.format(angle1, radius1,
+            angle2, radius2))
+
+    def do_debugcircle(self, center_angle, center_radius, circle_radius):
+        """
+        From the docs:
+        Similar to DebugLine above, but draws a circle. The first two arguments
+        are the angle and radius of the central point of the circle relative to
+        the robot. The third argument gives the radius of the circle.
+
+        All arguments are doubles
+        """
+        self.sendLine('DebugCircle {0} {1} {2}'.format(center_angle,
+            center_radius, circle_radius))
 
     def on_initialize(self, first):
         """

@@ -245,8 +245,7 @@ class Robot(basic.LineReceiver):
         elif opt_number == GameOption.SEND_ROBOT_COORDINATES:
             self.send_coordinates = opt_value
         else:
-            self.do_debug('Error: Unknown game option
-                    {0}'.format(opt_value))
+            self.do_debug('Error: Unknown game option {0}'.format(opt_value))
 
     def on_radar(self, distance, object_type, radar_angle):
         """

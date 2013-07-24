@@ -232,7 +232,7 @@ class Robot(basic.LineReceiver):
             self.max_energy = opt_value
         elif opt_number == GameOption.ROBOT_ENERGY_LEVELS:
             self.energy_levels = opt_value
-        elif opt_number == GameOption.ROBOT_SPEED:
+        elif opt_number == GameOption.SHOT_SPEED:
             self.robot_speed = opt_value
         elif opt_number == GameOption.SHOT_MIN_ENERGY:
             self.shot_min_energy = opt_value

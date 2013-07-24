@@ -4,6 +4,22 @@ import os
 from twisted.internet import stdio
 from twisted.protocols import basic
 
+def enum(*sequential, **named):
+    enums = dict(zip(sequential, range(len(sequential))), **named)
+    reverse = dict((value, key) for key, value in enums.iteritems())
+    enums['reverse_mapping'] = reverse
+    return type('Enum', (), enums)
+
+PartType = enum(ROBOT=1, CANNON=2, RADAR=4)
+
+ObjectType = enum(NOOBJECT = -1,
+                   ROBOT = 0,
+                   SHOT = 1,
+                   WALL = 2,
+                   COOKIE = 3,
+                   MINE = 4,
+                   LAST_OBJECT_TYPE = 5)
+
 class Robot(basic.LineReceiver):
     delimiter = os.linesep
     name = 'twister'

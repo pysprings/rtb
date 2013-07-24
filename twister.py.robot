@@ -10,6 +10,8 @@ def enum(*sequential, **named):
     enums['reverse_mapping'] = reverse
     return type('Enum', (), enums)
 
+PartType = enum(ROBOT=1, CANNON=2, RADAR=4)
+
 ObjectType = enum(NOOBJECT = -1,
                    ROBOT = 0,
                    SHOT = 1,
@@ -32,8 +34,6 @@ class Twister(Robot):
         This message gives information from the radar each turn. Remember that
         the radar-angle is relative to the robot front; it is given in radians.
         """
-        sys.stderr.write("{0}\n"
-                         .format(ObjectType.reverse_mapping[object_type]))
         if object_type == ObjectType.COOKIE:
             self.cookie_seen = True
             self.do_print("Cookie Seen!")
@@ -41,8 +41,7 @@ class Twister(Robot):
 
     def on_info(self, time, speed, angle):
         if self.cookie_seen:
-            self.do_accelerate(1)
-            self.do_rotate(7, -3)
+            self.do_rotateto(PartType.ROBOT, 3, -self.cookie_angle)
         else:
             self.do_rotate(7, 3)
 

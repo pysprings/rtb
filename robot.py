@@ -72,7 +72,10 @@ class Robot(basic.LineReceiver):
         velocity is given in radians per second and is limited by Robot
         (cannon/radar) max rotate speed.
         """
-        self.sendLine('Rotate {1} {0}'.format(what, velocity))
+        self.sendLine('Rotate {0} {1}'.format(what, velocity))
+
+    def do_rotateto(self, what, velocity, angle):
+        self.sendLine('RotateTo {0} {1} {2}'.format(what, velocity, angle))
 
     def do_shoot(self, energy):
         """

@@ -218,7 +218,7 @@ class Robot(basic.LineReceiver):
         """
         opt_number = int(opt_number)
         opt_value = float(opt_value)
-        if opt_number == GameOption.MAX_ROTATE:
+        if opt_number == GameOption.ROBOT_MAX_ROTATE:
             self.max_rotation = opt_value
         elif opt_number == GameOption.ROBOT_CANNON_MAX_ROTATE:
             self.max_cannon_rotation = opt_value

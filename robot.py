@@ -218,6 +218,35 @@ class Robot(basic.LineReceiver):
         """
         opt_number = int(opt_number)
         opt_value = float(opt_value)
+        if opt_number == GameOption.MAX_ROTATE:
+            self.max_rotation = opt_value
+        elif opt_number == GameOption.ROBOT_CANNON_MAX_ROTATE:
+            self.max_cannon_rotation = opt_value
+        elif opt_number == GameOption.ROBOT_RADAR_MAX_ROTATE:
+            self.max_radar_rotation = opt_value
+        elif opt_number == GameOption.ROBOT_MAX_ACCELERATION:
+            self.robot_max_acceleration = opt_value
+        elif opt_number == GameOption.ROBOT_MIN_ACCELERATION:
+            self.robot_min_acceleration = opt_value
+        elif opt_number == GameOption.ROBOT_MAX_ENERGY:
+            self.max_energy = opt_value
+        elif opt_number == GameOption.ROBOT_ENERGY_LEVELS:
+            self.energy_levels = opt_value
+        elif opt_number == GameOption.ROBOT_SPEED:
+            self.robot_speed = opt_value
+        elif opt_number == GameOption.SHOT_MIN_ENERGY:
+            self.shot_min_energy = opt_value
+        elif opt_number == GameOption.SHOT_MAX_ENERGY:
+            self.shot_max_energy = opt_value
+        elif opt_number == GameOption.TIMEOUT:
+            self.timeout = opt_value
+        elif opt_number == GameOption.DEBUG_LEVEL:
+            self.debug_level = opt_value
+        elif opt_number == GameOption.SEND_ROBOT_COORDINATES:
+            self.send_coordinates = opt_value
+        else:
+            self.do_debug('Error: Unknown game option
+                    {0}'.format(opt_value))
 
     def on_radar(self, distance, object_type, radar_angle):
         """

@@ -1,6 +1,5 @@
 #! /usr/bin/python
-import collections
-import sys
+import random
 
 from robot import Robot
 
@@ -26,24 +25,25 @@ class Twister(Robot):
     away_color = 'B7DEA9'
 
     def __init__(self):
-        self.cookie_seen = False
+        pass
 
     def on_radar(self, distance, object_type, radar_angle):
-        object_type = int(object_type)
-        """
-        This message gives information from the radar each turn. Remember that
-        the radar-angle is relative to the robot front; it is given in radians.
-        """
-        if object_type == ObjectType.COOKIE:
-            self.cookie_seen = True
-            self.do_print("Cookie Seen!")
-            self.cookie_angle = float(radar_angle)
+        self.distance = float(distance)
+        self.object_type = int(object_type)
+        self.radar_angle = float(radar_angle) # in unnormalized radians, IIRC
 
     def on_info(self, time, speed, angle):
-        if self.cookie_seen:
-            self.do_rotateto(PartType.ROBOT, 3, -self.cookie_angle)
+        actions = [lambda : self.do_rotate(PartType.ROBOT, -4),
+                   lambda : self.do_rotate(PartType.ROBOT, 4),
+                   lambda : None]
+        if self.object_type == ObjectType.ROBOT:
+            actions.append(lambda : self.do_shoot(1))
+        if self.distance > 4:
+            actions.append(lambda : self.do_accelerate(1))
         else:
-            self.do_rotate(7, 3)
+            actions.append(lambda : self.do_accelerate(-1))
+
+        random.choice(actions)()
 
 def main():
     from twisted.internet import stdio

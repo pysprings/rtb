@@ -64,7 +64,7 @@ class Robot(basic.LineReceiver):
         """
         self.sendLine('Accelerate {0}'.format(amount))
 
-    def do_rotate(self, what, velocity):
+    def do_rotate(self, velocity, what):
         """
         Set the angular velocity for the robot, its cannon and/or its radar.
         Set 'what to rotate' to 1 for robot, 2 for cannon, 4 for radar or to a
@@ -72,7 +72,7 @@ class Robot(basic.LineReceiver):
         velocity is given in radians per second and is limited by Robot
         (cannon/radar) max rotate speed.
         """
-        self.sendLine('Rotate {1} {0}'.format(what, velocity))
+        self.sendLine('Rotate {1} {0}'.format(velocity, what))
 
     def do_shoot(self, energy):
         """

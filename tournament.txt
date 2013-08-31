@@ -1,6 +1,7 @@
 Robots: 
 twister.py.robot 
 razzister.py.robot
+mariatobor.py.robot
 Arenas: 
 /usr/lib/realtimebattle/Arenas/Circle.arena 
 Robots/Sequence: 2

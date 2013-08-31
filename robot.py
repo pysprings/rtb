@@ -4,6 +4,39 @@ import os
 from twisted.internet import stdio
 from twisted.protocols import basic
 
+def enum(*sequential, **named):
+    enums = dict(zip(sequential, range(len(sequential))), **named)
+    reverse = dict((value, key) for key, value in enums.iteritems())
+    enums['reverse_mapping'] = reverse
+    return type('Enum', (), enums)
+
+PartType = enum(ROBOT=1, CANNON=2, RADAR=4)
+
+ObjectType = enum(NOOBJECT = -1,
+                   ROBOT = 0,
+                   SHOT = 1,
+                   WALL = 2,
+                   COOKIE = 3,
+                   MINE = 4,
+                   LAST_OBJECT_TYPE = 5)
+
+GameOption = enum(
+    ROBOT_MAX_ROTATE=0,
+    ROBOT_CANNON_MAX_ROTATE=1, 
+    ROBOT_RADAR_MAX_ROTATE=2,
+    ROBOT_MAX_ACCELERATION=3, 
+    ROBOT_MIN_ACCELERATION=4,
+    ROBOT_START_ENERGY=5, 
+    ROBOT_MAX_ENERGY=6, 
+    ROBOT_ENERGY_LEVELS=7,
+    SHOT_SPEED=8, 
+    SHOT_MIN_ENERGY=9, 
+    SHOT_MAX_ENERGY=10,
+    SHOT_ENERGY_INCREASE_SPEED=11,
+    TIMEOUT=12,
+    DEBUG_LEVEL=13,
+    SEND_ROBOT_COORDINATES= 14)
+
 class Robot(basic.LineReceiver):
     delimiter = os.linesep
     name = 'twister'
@@ -64,7 +97,7 @@ class Robot(basic.LineReceiver):
         """
         self.sendLine('Accelerate {0}'.format(amount))
 
-    def do_rotate(self, velocity, what):
+    def do_rotate(self, what, velocity):
         """
         Set the angular velocity for the robot, its cannon and/or its radar.
         Set 'what to rotate' to 1 for robot, 2 for cannon, 4 for radar or to a
@@ -72,13 +105,76 @@ class Robot(basic.LineReceiver):
         velocity is given in radians per second and is limited by Robot
         (cannon/radar) max rotate speed.
         """
-        self.sendLine('Rotate {1} {0}'.format(velocity, what))
+        self.sendLine('Rotate {0} {1}'.format(what, velocity))
+
+    def do_rotateto(self, what, velocity, angle):
+        self.sendLine('RotateTo {0} {1} {2}'.format(what, velocity, angle))
+
+    def do_rotateamount(self, what, velocity, angle):
+        """
+        Rotate the given part (robot, turret or radar) to the given angle,
+        at the given velocity, relative to the current angle.
+        """
+        self.sendLine('RotateAngle {0} {1} {2}'.format(what, velocity, angle))
+
+    def do_sweep(self, what, velocity, right_angle, left_angle):
+        """
+        This does not work with the robot. This will set the radar or turret to
+        sweep between the given angles at the given angular velocity.
+
+        NOTE: There may be an error where the radar does not report events when
+        in sweep mode.
+        """
+        self.sendLine('Sweep {0} {1} {2} {3}'.format(what, velocity,
+            right_angle, left_angle))
 
     def do_shoot(self, energy):
         """
         Shoot with the given energy. The shot options give more information.
         """
         self.sendLine('Shoot {0}'.format(energy))
+
+    def do_brake(self, portion):
+        """
+        Applies the brake. `Portion' ranges from 0.0 to 1.0, where
+        1.0 means that the friction is equal to the (world-defined) 
+        slide friction
+        """
+        self.sendLine('Brake {0}'.format(portion))
+
+    def do_debug(self, message):
+        """
+        Prints a message in the message window if in debug mode.
+
+        TODO:
+        Maybe turn off this command if it's not in debug mode
+        """
+        self.sendLine('Debug {0}'.format(message))
+
+    def do_debugline(self, angle1, radius1, angle2, radius2):
+        """
+        From the docs:
+        Draw a line direct to the arena. This is only allowed in the highest
+        debug level(5), otherwise a warning message is sent. The arguments are
+        the start and end point of the line given in polar coordinates relative
+        to the robot.
+
+        All of the arguments are doubles.
+        """
+        self.sendLine('DebugLine {0} {1} {2} {3}'.format(angle1, radius1,
+            angle2, radius2))
+
+    def do_debugcircle(self, center_angle, center_radius, circle_radius):
+        """
+        From the docs:
+        Similar to DebugLine above, but draws a circle. The first two arguments
+        are the angle and radius of the central point of the circle relative to
+        the robot. The third argument gives the radius of the circle.
+
+        All arguments are doubles
+        """
+        self.sendLine('DebugCircle {0} {1} {2}'.format(center_angle,
+            center_radius, circle_radius))
 
     def on_initialize(self, first):
         """
@@ -122,6 +218,34 @@ class Robot(basic.LineReceiver):
         """
         opt_number = int(opt_number)
         opt_value = float(opt_value)
+        if opt_number == GameOption.ROBOT_MAX_ROTATE:
+            self.max_rotation = opt_value
+        elif opt_number == GameOption.ROBOT_CANNON_MAX_ROTATE:
+            self.max_cannon_rotation = opt_value
+        elif opt_number == GameOption.ROBOT_RADAR_MAX_ROTATE:
+            self.max_radar_rotation = opt_value
+        elif opt_number == GameOption.ROBOT_MAX_ACCELERATION:
+            self.robot_max_acceleration = opt_value
+        elif opt_number == GameOption.ROBOT_MIN_ACCELERATION:
+            self.robot_min_acceleration = opt_value
+        elif opt_number == GameOption.ROBOT_MAX_ENERGY:
+            self.max_energy = opt_value
+        elif opt_number == GameOption.ROBOT_ENERGY_LEVELS:
+            self.energy_levels = opt_value
+        elif opt_number == GameOption.SHOT_SPEED:
+            self.robot_speed = opt_value
+        elif opt_number == GameOption.SHOT_MIN_ENERGY:
+            self.shot_min_energy = opt_value
+        elif opt_number == GameOption.SHOT_MAX_ENERGY:
+            self.shot_max_energy = opt_value
+        elif opt_number == GameOption.TIMEOUT:
+            self.timeout = opt_value
+        elif opt_number == GameOption.DEBUG_LEVEL:
+            self.debug_level = opt_value
+        elif opt_number == GameOption.SEND_ROBOT_COORDINATES:
+            self.send_coordinates = opt_value
+        else:
+            self.do_debug('Error: Unknown game option {0}'.format(opt_value))
 
     def on_radar(self, distance, object_type, radar_angle):
         """
